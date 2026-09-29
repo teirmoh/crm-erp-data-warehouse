@@ -1,0 +1,24 @@
+# Raw source data — not tracked (large, environment-specific, may be sensitive)
+datasets/
+*.csv
+*.tsv
+
+# Local environment/connection settings — never commit real credentials
+*.env
+!*.env.example
+
+# draw.io autosave/backup files
+*.bkp
+*.dtmp
+
+# SSMS / Visual Studio local files
+.vs/
+*.suo
+*.user
+*.ide
+bin/
+obj/
+
+# OS files
+.DS_Store
+Thumbs.db
