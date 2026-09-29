@@ -14,12 +14,19 @@ into analytics-ready tables.
 
 ## Architecture
 
-- **Bronze** — raw, unmodified data loaded as-is from source CSV extracts
-  via `BULK INSERT`. No business rules applied; column types are widened as
-  needed to avoid truncation on ingestion.
-- **Silver** — cleansed, standardized, and typed data (e.g. date columns cast
-  from raw `INT`/text to `DATE`, business keys and codes normalized). Each
-  Silver table carries a `dwh_create_date` audit column.
+This project implements **ELT** (Extract, Load, Transform) rather than a
+full end-to-end ETL pipeline:
+
+- **Extraction** — *out of scope.* The pipeline assumes CRM/ERP source data
+  has already been extracted to CSV files in `datasets/`. It does not
+  connect to any source CRM/ERP system directly; producing those CSVs is a
+  separate, upstream process.
+- **Bronze (Load)** — raw, unmodified data loaded as-is from the extracted
+  CSV files via `BULK INSERT`. No business rules applied; column types are
+  widened as needed to avoid truncation on ingestion.
+- **Silver (Transform)** — cleansed, standardized, and typed data (e.g. date
+  columns cast from raw `INT`/text to `DATE`, business keys and codes
+  normalized). Each Silver table carries a `dwh_create_date` audit column.
 - **Gold** — business-ready, modeled data (facts/dimensions) for reporting
   and analytics. Not yet built.
 
