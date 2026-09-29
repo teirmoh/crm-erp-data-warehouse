@@ -120,3 +120,17 @@ with specifics once the test scripts are finalized.)*
 - [ ] Data model diagram (`docs/`)
 - [ ] Data quality / validation scripts in `tests/`
 - [ ] Documentation of source-to-target mappings
+
+## About Me
+
+**Mohammed Abuteir**
+Aspiring Data Engineer | BSc Software Development, Islamic University of Gaza (2019–2023)
+
+I'm a software developer from Gaza working toward a career in data
+engineering, currently pursuing a funded Master's abroad in the field. This
+project is part of building hands-on experience with enterprise SQL Server
+development, ETL pipeline design, and the medallion (Bronze-Silver-Gold)
+architecture pattern.
+
+- 📧 [teirmoh@gmail.com](mailto:teirmoh@gmail.com)
+- 💻 [github.com/teirmoh](https://github.com/teirmoh)
