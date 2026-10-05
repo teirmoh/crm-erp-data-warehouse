@@ -1,5 +1,5 @@
 /* ============================================================================
-   Script Name     : 02_load_bronze_proc.sql
+   Script Name     : load_bronze_proc.sql
    Description     : Creates (or alters) the stored procedure that performs a
                       full-refresh load of the Bronze layer staging tables via
                       BULK INSERT from flat-file CRM and ERP source extracts.

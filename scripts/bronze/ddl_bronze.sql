@@ -1,5 +1,5 @@
 /* ============================================================================
-   Script Name     : 01_ddl_bronze.sql
+   Script Name     : ddl_bronze.sql
    Description     : Creates (drops and recreates) the Bronze layer staging 
                       tables for CRM and ERP source system ingestion.
                       Includes: crm_cust_info, crm_prd_info, crm_sales_details,
@@ -63,8 +63,8 @@ CREATE TABLE bronze.crm_prd_info
     prd_nm        NVARCHAR(30),
     prd_cost      INT,
     prd_line      NVARCHAR(5),
-    prd_start_dt  DATE,
-    prd_end_dt    DATE
+    prd_start_dt  DATETIME,
+    prd_end_dt    DATETIME
 );
 GO
 

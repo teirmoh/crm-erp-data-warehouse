@@ -1,5 +1,5 @@
 /* ============================================================================
-   Script Name     : 03_ddl_silver.sql
+   Script Name     : ddl_silver.sql
    Description     : Creates (drops and recreates) the Silver layer tables
                       for CRM and ERP data. Mirrors the Bronze layer schema
                       with two changes: (1) columns are widened/typed toward
@@ -63,6 +63,7 @@ GO
 CREATE TABLE silver.crm_prd_info
 (
     prd_id           INT,
+	prd_cat			 NVARCHAR(10),
     prd_key          NVARCHAR(20),
     prd_nm           NVARCHAR(30),
     prd_cost         INT,

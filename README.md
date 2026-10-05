@@ -9,7 +9,7 @@ into analytics-ready tables.
 | Layer  | DDL | Load Logic | Status        |
 |--------|-----|------------|---------------|
 | Bronze | ✅  | ✅         | Complete      |
-| Silver | ✅  | ⏳         | In progress   |
+| Silver | ✅  | ✅         | Complete      |
 | Gold   | ⏳  | ⏳         | Not started   |
 
 ## Architecture
@@ -38,14 +38,17 @@ full end-to-end ETL pipeline:
 crm-erp-data-warehouse/
 ├── scripts/
 │   ├── bronze/
-│   │   ├── 01_ddl.sql              # Creates bronze schema tables
-│   │   └── 02_load_procedure.sql   # bronze.load_bronze — BULK INSERT from CSV
+│   │   ├── ddl_bronze.sql           # Creates bronze schema tables
+│   │   └── load_bronze_proc.sql     # bronze.load_bronze — BULK INSERT from CSV
 │   ├── silver/
-│   │   └── 01_ddl.sql              # Creates silver schema tables
-│   └── gold/                       # Reserved for Gold layer scripts
-├── datasets/                       # Raw CRM/ERP CSV extracts (not tracked in git)
-├── docs/                           # Diagrams and planning notes (see below)
-├── tests/                          # Validation / data quality test scripts
+│   │   ├── ddl_silver.sql           # Creates silver schema tables
+│   │   └── load_silver_proc.sql     # silver.load_silver — Bronze -> Silver transform
+│   └── gold/                        # Reserved for Gold layer scripts
+├── datasets/                        # Raw CRM/ERP CSV extracts (not tracked in git)
+├── docs/                            # Diagrams and planning notes (see below)
+├── tests/                           # Validation / data quality test scripts
+│   ├── data_quality_checks_bronze.sql
+│   └── data_quality_checks_silver.sql
 ├── .gitignore
 └── README.md
 ```
@@ -82,10 +85,13 @@ crm-erp-data-warehouse/
 
 ## Testing (`tests/`)
 
-Holds validation and data quality scripts for the pipeline — e.g. row-count
-reconciliation between Bronze and Silver, null/duplicate checks, and
-referential integrity checks across CRM/ERP sources. *(Update this section
-with specifics once the test scripts are finalized.)*
+- `data_quality_checks_bronze.sql` — diagnostic checks against raw Bronze
+  data (nulls, duplicates, untrimmed text, invalid codes, business-rule
+  violations) to identify what the Silver transformation needs to fix.
+- `data_quality_checks_silver.sql` — post-transformation checks validating
+  that `silver.load_silver`'s cleansing rules actually hold; includes notes
+  on a few known, currently-unhandled edge cases in the transformation
+  logic.
 
 ## Prerequisites
 
@@ -106,27 +112,34 @@ with specifics once the test scripts are finalized.)*
    ```
 3. **Bronze layer**
    ```sql
-   :r scripts/bronze/01_ddl.sql
-   :r scripts/bronze/02_load_procedure.sql
+   :r scripts/bronze/ddl_bronze.sql
+   :r scripts/bronze/load_bronze_proc.sql
    EXEC bronze.load_bronze;
    ```
 4. **Silver layer**
    ```sql
-   :r scripts/silver/01_ddl.sql
-   -- Silver load procedure (Bronze -> Silver transformation) is in progress
+   :r scripts/silver/ddl_silver.sql
+   :r scripts/silver/load_silver_proc.sql
+   EXEC silver.load_silver;
+   ```
+5. **Validate** *(optional but recommended)*
+   ```sql
+   :r tests/data_quality_checks_bronze.sql
+   :r tests/data_quality_checks_silver.sql
    ```
 
-> Note: `BULK INSERT` file paths in `02_load_procedure.sql` are currently
+> Note: `BULK INSERT` file paths in `load_bronze_proc.sql` are currently
 > hard-coded local paths (see script comments). Update these to match your
 > environment before running.
 
 ## Roadmap
 
-- [ ] Silver layer transformation/load procedure
+- [x] Silver layer transformation/load procedure
+- [x] Data quality / validation scripts in `tests/`
 - [ ] Gold layer dimensional model (facts/dimensions)
 - [ ] Data model diagram (`docs/`)
-- [ ] Data quality / validation scripts in `tests/`
 - [ ] Documentation of source-to-target mappings
+- [ ] Fix known Silver-layer edge cases (see `tests/data_quality_checks_silver.sql` notes: `prd_nm`, `erp_loc_a101.cid`, `erp_px_cat_g1v2.maintenance` not trimmed; sales/quantity/price correction logic doesn't chain)
 
 ## About Me
 
