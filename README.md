@@ -136,10 +136,17 @@ crm-erp-data-warehouse/
 
 - [x] Silver layer transformation/load procedure
 - [x] Data quality / validation scripts in `tests/`
+- [x] Silver layer validated against `tests/data_quality_checks_silver.sql` — current dataset passes clean
 - [ ] Gold layer dimensional model (facts/dimensions)
 - [ ] Data model diagram (`docs/`)
 - [ ] Documentation of source-to-target mappings
-- [ ] Fix known Silver-layer edge cases (see `tests/data_quality_checks_silver.sql` notes: `prd_nm`, `erp_loc_a101.cid`, `erp_px_cat_g1v2.maintenance` not trimmed; sales/quantity/price correction logic doesn't chain)
+
+> Note: a few Silver-layer edge cases are documented but latent (not
+> triggered by the current dataset) — see `NOTE:` comments in
+> `tests/data_quality_checks_silver.sql` (`prd_nm`, `erp_loc_a101.cid`,
+> `erp_px_cat_g1v2.maintenance` not trimmed; sales/quantity/price correction
+> logic doesn't chain across fields). Worth fixing before trusting the
+> pipeline on a different or larger dataset.
 
 ## About Me
 
