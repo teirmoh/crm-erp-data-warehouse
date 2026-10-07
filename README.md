@@ -78,9 +78,13 @@ crm-erp-data-warehouse/
 
 ### Data Model
 
-See [`docs/star_schema.md`](docs/star_schema.md) for the Gold layer's star
-schema ERD (Mermaid diagram, renders natively on GitHub) and grain
-definition.
+![Star Schema Diagram](docs/data_model.drawio.png)
+
+Star schema for the Gold layer: `gold.fact_sales` at the center, joined to
+`gold.dim_customers` and `gold.dim_products` via surrogate keys
+(`customer_key`, `product_key`). See
+[`docs/data_catalog.md`](docs/data_catalog.md) for column-level detail and
+grain definition.
 
 ### Data Catalog
 
@@ -167,7 +171,7 @@ documented known gaps in the source data.
 - [x] Silver layer validated against `tests/data_quality_checks_silver.sql` — current dataset passes clean
 - [x] Gold layer dimensional model (`gold.dim_customers`, `gold.dim_products`, `gold.fact_sales`)
 - [x] Gold layer validated against `tests/data_quality_checks_gold.sql` — all gaps traced to confirmed source-data causes
-- [x] Data model diagram (`docs/star_schema.md`)
+- [x] Data model diagram (`docs/data_model.drawio.png`)
 - [x] Data catalog (`docs/data_catalog.md`)
 
 > Note: a few Silver-layer edge cases are documented but latent (not
