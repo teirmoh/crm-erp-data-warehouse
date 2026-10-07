@@ -10,7 +10,10 @@ into analytics-ready tables.
 |--------|-----|------------|---------------|
 | Bronze | ✅  | ✅         | Complete      |
 | Silver | ✅  | ✅         | Complete      |
-| Gold   | ⏳  | ⏳         | Not started   |
+| Gold   | ✅  | n/a *       | Complete      |
+
+\* Gold has no separate load procedure — it's built entirely from views,
+which compute live from Silver on every query rather than storing data.
 
 ## Architecture
 
@@ -27,8 +30,12 @@ full end-to-end ETL pipeline:
 - **Silver (Transform)** — cleansed, standardized, and typed data (e.g. date
   columns cast from raw `INT`/text to `DATE`, business keys and codes
   normalized). Each Silver table carries a `dwh_create_date` audit column.
-- **Gold** — business-ready, modeled data (facts/dimensions) for reporting
-  and analytics. Not yet built.
+- **Gold** — business-ready, dimensionally-modeled views (`dim_customers`,
+  `dim_products`, `fact_sales`) built directly on Silver. Unlike Bronze and
+  Silver, Gold objects are views, not tables — no load procedure, no stored
+  data; each view computes live from Silver on every query. Fact-to-dimension
+  joins use warehouse-generated surrogate keys only, never source business
+  keys, following standard Kimball star-schema convention.
 
 ![Architecture Diagram](docs/DataWarehouseArchitecture.drawio.png)
 
@@ -43,7 +50,8 @@ crm-erp-data-warehouse/
 │   ├── silver/
 │   │   ├── ddl_silver.sql           # Creates silver schema tables
 │   │   └── load_silver_proc.sql     # silver.load_silver — Bronze -> Silver transform
-│   └── gold/                        # Reserved for Gold layer scripts
+│   └── gold/
+│       └── ddl_gold.sql              # Creates gold schema views (dims + fact)
 ├── datasets/                        # Raw CRM/ERP CSV extracts (not tracked in git)
 ├── docs/                            # Diagrams and planning notes (see below)
 ├── tests/                           # Validation / data quality test scripts
@@ -69,7 +77,7 @@ crm-erp-data-warehouse/
 
 ### Data Model
 
-*Not yet added — planned once the Gold-layer dimensional model is designed.*
+![Data Model Diagram](docs/data_model.drawio.png)
 
 ### Notes
 
@@ -122,7 +130,14 @@ crm-erp-data-warehouse/
    :r scripts/silver/load_silver_proc.sql
    EXEC silver.load_silver;
    ```
-5. **Validate** *(optional but recommended)*
+5. **Gold layer**
+   ```sql
+   :r scripts/gold/ddl_gold.sql
+   ```
+   No `EXEC` step — Gold objects are views; querying `gold.dim_customers`,
+   `gold.dim_products`, or `gold.fact_sales` directly computes the result
+   live from Silver.
+6. **Validate** *(optional but recommended)*
    ```sql
    :r tests/data_quality_checks_bronze.sql
    :r tests/data_quality_checks_silver.sql
@@ -137,8 +152,8 @@ crm-erp-data-warehouse/
 - [x] Silver layer transformation/load procedure
 - [x] Data quality / validation scripts in `tests/`
 - [x] Silver layer validated against `tests/data_quality_checks_silver.sql` — current dataset passes clean
-- [ ] Gold layer dimensional model (facts/dimensions)
-- [ ] Data model diagram (`docs/`)
+- [x] Gold layer dimensional model (`gold.dim_customers`, `gold.dim_products`, `gold.fact_sales`)
+- [x] Data model diagram (`docs/`)
 - [ ] Documentation of source-to-target mappings
 
 > Note: a few Silver-layer edge cases are documented but latent (not
