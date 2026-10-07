@@ -53,10 +53,11 @@ crm-erp-data-warehouse/
 │   └── gold/
 │       └── ddl_gold.sql              # Creates gold schema views (dims + fact)
 ├── datasets/                        # Raw CRM/ERP CSV extracts (not tracked in git)
-├── docs/                            # Diagrams and planning notes (see below)
+├── docs/                            # Diagrams, data catalog, planning notes (see below)
 ├── tests/                           # Validation / data quality test scripts
 │   ├── data_quality_checks_bronze.sql
-│   └── data_quality_checks_silver.sql
+│   ├── data_quality_checks_silver.sql
+│   └── data_quality_checks_gold.sql
 ├── .gitignore
 └── README.md
 ```
@@ -77,7 +78,15 @@ crm-erp-data-warehouse/
 
 ### Data Model
 
-![Data Model Diagram](docs/data_model.drawio.png)
+See [`docs/star_schema.md`](docs/star_schema.md) for the Gold layer's star
+schema ERD (Mermaid diagram, renders natively on GitHub) and grain
+definition.
+
+### Data Catalog
+
+See [`docs/data_catalog.md`](docs/data_catalog.md) for a full column-level
+reference of every Gold layer view — data types, business meaning, and
+documented known gaps in the source data.
 
 ### Notes
 
@@ -100,6 +109,9 @@ crm-erp-data-warehouse/
   that `silver.load_silver`'s cleansing rules actually hold; includes notes
   on a few known, currently-unhandled edge cases in the transformation
   logic.
+- `data_quality_checks_gold.sql` — referential integrity and grain checks
+  against the Gold layer views; validated clean except for documented,
+  investigated source-data gaps (see `docs/data_catalog.md`).
 
 ## Prerequisites
 
@@ -141,6 +153,7 @@ crm-erp-data-warehouse/
    ```sql
    :r tests/data_quality_checks_bronze.sql
    :r tests/data_quality_checks_silver.sql
+   :r tests/data_quality_checks_gold.sql
    ```
 
 > Note: `BULK INSERT` file paths in `load_bronze_proc.sql` are currently
@@ -153,8 +166,9 @@ crm-erp-data-warehouse/
 - [x] Data quality / validation scripts in `tests/`
 - [x] Silver layer validated against `tests/data_quality_checks_silver.sql` — current dataset passes clean
 - [x] Gold layer dimensional model (`gold.dim_customers`, `gold.dim_products`, `gold.fact_sales`)
-- [x] Data model diagram (`docs/`)
-- [ ] Documentation of source-to-target mappings
+- [x] Gold layer validated against `tests/data_quality_checks_gold.sql` — all gaps traced to confirmed source-data causes
+- [x] Data model diagram (`docs/star_schema.md`)
+- [x] Data catalog (`docs/data_catalog.md`)
 
 > Note: a few Silver-layer edge cases are documented but latent (not
 > triggered by the current dataset) — see `NOTE:` comments in
