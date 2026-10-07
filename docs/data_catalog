@@ -125,5 +125,5 @@ bronze.crm_sales_details ───> silver.crm_sales_details ───> gold.fac
                                                                dim_products via surrogate keys)
 ```
 
-See `docs/star_schema.md` for the visual ERD, and
+See `docs/data_model.drawio.png` for the visual ERD, and
 `scripts/gold/ddl_gold.sql` for the view definitions.
